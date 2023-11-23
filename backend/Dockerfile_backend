@@ -1,0 +1,12 @@
+FROM python:3.11-alpine3.18
+
+WORKDIR /backend
+
+COPY poetry.lock .
+COPY pyproject.toml .
+
+EXPOSE 8000
+
+RUN pip install poetry && poetry install
+
+COPY ./backend .
