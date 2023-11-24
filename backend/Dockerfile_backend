@@ -1,12 +1,14 @@
+FROM python:3.11-alpine3.18 AS builder
+
+COPY poetry.lock pyproject.toml ./
+RUN python -m pip install --no-cache-dir poetry poetry-plugin-export && \
+    poetry export --without-hashes --without test -f requirements.txt -o requirements.txt
+
 FROM python:3.11-alpine3.18
 
 WORKDIR /backend
 
-COPY poetry.lock .
-COPY pyproject.toml .
+COPY --from=builder requirements.txt ./
+RUN python -m pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 8000
-
-RUN pip install poetry && poetry install
-
-COPY ./backend .
+COPY . .

@@ -1,9 +1,8 @@
 [tool.poetry]
-name = "managerpasswords"
+name = "backend"
 version = "0.1.0"
 description = "api for managing the passwords"
 authors = ["LyaKakoyPC <LYAKAKOYXY@yandex.ru>"]
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"

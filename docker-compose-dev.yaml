@@ -3,12 +3,12 @@ services:
   backend:
     container_name: backend
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile_backend
     volumes:
       - ./backend:/backend
     env_file:
-      - .env
+      - backend/.env
     environment:
       DATABASE: database
     networks:
@@ -26,7 +26,7 @@ services:
     volumes:
       - data_db:/var/lib/postgresql/data
     env_file:
-      - .env
+      - backend/.env
     ports:
       - '127.0.0.1:5432:5432'
     networks:
