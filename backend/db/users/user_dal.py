@@ -15,6 +15,7 @@ class UserDAL:
             self.db_session.add(new_user)
             await self.db_session.flush()
             await self.db_session.commit()
+            return new_user
         except IntegrityError:
             await self.db_session.rollback()
             return
@@ -28,3 +29,4 @@ class UserDAL:
         except IntegrityError:
             await self.db_session.rollback()
             return
+
