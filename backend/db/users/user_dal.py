@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,3 +32,12 @@ class UserDAL:
             await self.db_session.rollback()
             return
 
+    async def get_user_by_login(self, login: str) -> User | None:
+        user = await self.db_session.get(User, login)
+        if user is not None:
+            return user
+
+    async def get_user_by_user_id(self, user_id: uuid.UUID) -> User | None:
+        user = await self.db_session.get(User, user_id)
+        if user is not None:
+            return user
