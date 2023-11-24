@@ -1,8 +1,6 @@
 from db.users.user_dal import UserDAL
 import pytest
 
-from tests.db_test import async_session
-
 
 @pytest.mark.parametrize(
     "login, password",
