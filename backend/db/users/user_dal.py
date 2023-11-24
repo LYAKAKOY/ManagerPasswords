@@ -1,3 +1,4 @@
+from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +15,16 @@ class UserDAL:
             self.db_session.add(new_user)
             await self.db_session.flush()
             await self.db_session.commit()
+        except IntegrityError:
+            await self.db_session.rollback()
+            return
+
+    async def set_password(self, login: str, password: str) -> User | None:
+        try:
+            query = update(User).where(User.login == login).values(password=password).returning(User.user_id)
+            user = await self.db_session.scalar(query)
+            if user is None:
+                return user
         except IntegrityError:
             await self.db_session.rollback()
             return
