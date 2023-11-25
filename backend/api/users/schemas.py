@@ -13,3 +13,7 @@ class CreateUser(BaseModel):
 
 class ShowUser(TunedModel):
     user_id: uuid.UUID
+
+class ChangePasswordUser(BaseModel):
+    login: str
+    password: str
