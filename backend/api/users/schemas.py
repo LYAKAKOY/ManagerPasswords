@@ -1,11 +1,6 @@
 import uuid
-
 from pydantic import BaseModel
-
-
-class TunedModel(BaseModel):
-    class Config:
-        from_attributes = True
+from api.base_schemas import TunedModel
 
 class CreateUser(BaseModel):
     login: str
