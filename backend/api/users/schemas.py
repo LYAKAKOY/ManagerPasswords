@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import BaseModel
 
 
@@ -8,3 +10,6 @@ class TunedModel(BaseModel):
 class CreateUser(BaseModel):
     login: str
     password: str
+
+class ShowUser(TunedModel):
+    user_id: uuid.UUID
