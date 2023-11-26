@@ -1,4 +1,5 @@
 import asyncio
+import os
 from typing import Generator, Any
 from httpx import AsyncClient
 import pytest
@@ -15,6 +16,10 @@ def event_loop():
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
+
+@pytest.fixture(scope="session", autouse=True)
+def run_migrations():
+    os.system("alembic upgrade heads")
 
 @pytest.fixture(scope="session")
 async def async_session_test():
