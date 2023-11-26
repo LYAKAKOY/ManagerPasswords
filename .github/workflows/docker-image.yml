@@ -47,4 +47,8 @@ jobs:
           postgresql password: hello_fastapi
       - name: Test with pytest
         run: |
+          echo "POSTGRES_USER=hello_fastapi" >> $GITHUB_ENV
+          echo "POSTGRES_PASSWORD=hello_fastapi" >> $GITHUB_ENV
+          echo "POSTGRES_DB=hello_fastapi_dev" >> $GITHUB_ENV
+          echo "DATABASE=127.0.0.1" >> $GITHUB_ENV
           cd backend && pytest
