@@ -47,5 +47,4 @@ jobs:
           postgresql password: hello_fastapi
       - name: Test with pytest
         run: |
-          pip install pytest
-          pytest .
+          cd backend && pytest
