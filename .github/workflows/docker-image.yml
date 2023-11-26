@@ -12,6 +12,11 @@ jobs:
 
     runs-on: ubuntu-latest
     strategy:
+      env:
+        DATABASE: localhost
+        POSTGRES_DB: hello_fastapi_dev
+        POSTGRES_USER: hello_fastapi
+        POSTGRES_PASSWORD: hello_fastapi
       matrix:
         python-version: [3.11]
 
@@ -21,10 +26,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-          DATABASE: postgresql
-          POSTGRES_DB: hello_fastapi_dev
-          POSTGRES_USER: hello_fastapi
-          POSTGRES_PASSWORD: hello_fastapi
 
       - name: Install dependencies
         run: |
@@ -42,13 +43,9 @@ jobs:
       - name: Setup PostgreSQL
         uses: Harmon758/postgresql-action@v1.0.0
         with:
-          # Version of PostgreSQL to use
-          postgresql version: 12.1-alpine
-          # POSTGRES_DB - name for the default database that is created
+          postgresql version: 15-alpine
           postgresql db: hello_fastapi_dev
-          # POSTGRES_USER - create the specified user with superuser power
           postgresql user: hello_fastapi
-          # POSTGRES_PASSWORD - superuser password
           postgresql password: hello_fastapi
       - name: Test with pytest
         run: |
