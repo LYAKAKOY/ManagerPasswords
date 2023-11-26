@@ -21,6 +21,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+          DATABASE: postgresql
+          # POSTGRES_DB - name for the default database that is created
+          POSTGRES_DB: hello_fastapi_dev
+          # POSTGRES_USER - create the specified user with superuser power
+          POSTGRES_USER: hello_fastapi
+          # POSTGRES_PASSWORD - superuser password
+          POSTGRES_PASSWORD: hello_fastapi
+
       - name: Install dependencies
         run: |
             python -m pip install --upgrade pip
@@ -47,8 +55,4 @@ jobs:
           postgresql password: hello_fastapi
       - name: Test with pytest
         run: |
-          echo "POSTGRES_USER=hello_fastapi" >> $GITHUB_ENV
-          echo "POSTGRES_PASSWORD=hello_fastapi" >> $GITHUB_ENV
-          echo "POSTGRES_DB=hello_fastapi_dev" >> $GITHUB_ENV
-          echo "DATABASE=127.0.0.1" >> $GITHUB_ENV
           cd backend && pytest
