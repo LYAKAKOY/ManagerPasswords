@@ -32,4 +32,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        docker-compose -f docker-compose-test.yaml run --rm backend_test sh -c 'pytest'
+         docker-compose -f docker-compose-test.yaml up -d && docker-compose -f docker-compose-test.yaml run --rm backend_test sh -c 'pytest'
