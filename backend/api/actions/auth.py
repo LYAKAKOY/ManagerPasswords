@@ -27,13 +27,13 @@ async def _get_user_by_login_for_auth(login: str, session: AsyncSession) -> User
         user_dal = UserDAL(session)
         return await user_dal.get_user_by_login(login=login)
 
-async def authenticate_user(login: str, password: str, db: AsyncSession) -> str | None:
+async def authenticate_user(login: str, password: str, db: AsyncSession) -> User | None:
     user = await _get_user_by_login_for_auth(login=login, session=db)
     if user is None:
         return
     if not Hasher.verify_password(password, user.password):
         return
-    return user.user_id
+    return user
 
 
 async def get_current_user_from_token(
