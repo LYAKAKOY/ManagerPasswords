@@ -2,5 +2,5 @@ from pydantic import BaseModel
 
 
 class TunedModel(BaseModel):
-    class Config:
+    class ConfigDict:
         from_attributes = True

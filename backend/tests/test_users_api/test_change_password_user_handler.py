@@ -37,9 +37,9 @@ async def test_change_password_user(
         new_user_data,
         expected_status_code,
 ):
-    await client.post("/user/reg", data=json.dumps(user_data),)
+    await client.post("/user/reg", content=json.dumps(user_data),)
     response = await client.put("/user/change_password",
-                                 data=json.dumps(new_user_data),
+                                 content=json.dumps(new_user_data),
                                  )
     data_from_response = response.json()
     assert response.status_code == expected_status_code
@@ -86,9 +86,9 @@ async def test_change_password_user_with_simple_password(
         expected_status_code,
         expected_data,
 ):
-    await client.post("/user/reg", data=json.dumps(user_data),)
+    await client.post("/user/reg", content=json.dumps(user_data),)
     response = await client.put("/user/change_password",
-                                 data=json.dumps(new_user_data),
+                                 content=json.dumps(new_user_data),
                                  )
     data_from_response = response.json()
     assert response.status_code == expected_status_code
@@ -117,7 +117,7 @@ async def test_change_password_non_existent_user(
         expected_data,
 ):
     response = await client.put("/user/change_password",
-                                 data=json.dumps(new_user_data),
+                                 content=json.dumps(new_user_data),
                                  )
     data_from_response = response.json()
     assert response.status_code == expected_status_code

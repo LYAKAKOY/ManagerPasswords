@@ -26,7 +26,7 @@ async def test_create_user_handler(
     expected_status_code,
 ):
     response = await client.post("/user/reg",
-        data=json.dumps(user_data),
+        content=json.dumps(user_data),
     )
     data_from_response = response.json()
     assert response.status_code == expected_status_code
@@ -64,7 +64,7 @@ async def test_create_user_with_simple_password(
         expected_data,
 ):
     response = await client.post("/user/reg",
-                                 data=json.dumps(user_data),
+                                 content=json.dumps(user_data),
                                  )
     data_from_response = response.json()
     assert response.status_code == expected_status_code
@@ -103,7 +103,7 @@ async def test_create_user_with_short_login(
         expected_data,
 ):
     response = await client.post("/user/reg",
-                                 data=json.dumps(user_data),
+                                 content=json.dumps(user_data),
                                  )
     data_from_response = response.json()
     assert response.status_code == expected_status_code

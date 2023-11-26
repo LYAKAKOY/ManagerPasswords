@@ -35,11 +35,8 @@ async def clean_tables(async_session_test):
 
 
 async def _get_test_db():
-    test_db = async_session()
-    try:
-        yield test_db
-    finally:
-        test_db.close()
+    async with async_session() as session:
+        yield session
 
 @pytest.fixture(scope="function")
 async def client() -> Generator[AsyncClient, Any, None]:
