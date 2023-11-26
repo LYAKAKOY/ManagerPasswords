@@ -42,7 +42,7 @@ async def test_create_user_handler(
                 },
                 422,
                 {
-                    "detail": "password is too simple"
+                    "detail": "the password is too simple"
                 },
         ),
         (
@@ -52,12 +52,51 @@ async def test_create_user_handler(
                 },
                 422,
                 {
-                    "detail": "password is too simple"
+                    "detail": "the password is too simple"
                 },
         ),
     ]
 )
 async def test_create_user_with_simple_password(
+        client,
+        user_data,
+        expected_status_code,
+        expected_data,
+):
+    response = await client.post("/user/reg",
+                                 data=json.dumps(user_data),
+                                 )
+    data_from_response = response.json()
+    assert response.status_code == expected_status_code
+    assert data_from_response == expected_data
+
+
+@pytest.mark.parametrize(
+    "user_data, expected_status_code, expected_data",
+    [
+        (
+                {
+                    "login": "log1",
+                    "password": "ADVCDJ432d",
+                },
+                422,
+                {
+                    "detail": "the login is too short"
+                },
+        ),
+        (
+                {
+                    "login": "log2",
+                    "password": "ASDFVy13",
+                },
+                422,
+                {
+                    "detail": "the login is too short"
+                },
+        ),
+    ]
+)
+async def test_create_user_with_short_login(
         client,
         user_data,
         expected_status_code,
