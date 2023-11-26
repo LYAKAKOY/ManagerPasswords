@@ -22,11 +22,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           DATABASE: postgresql
-          # POSTGRES_DB - name for the default database that is created
           POSTGRES_DB: hello_fastapi_dev
-          # POSTGRES_USER - create the specified user with superuser power
           POSTGRES_USER: hello_fastapi
-          # POSTGRES_PASSWORD - superuser password
           POSTGRES_PASSWORD: hello_fastapi
 
       - name: Install dependencies
