@@ -34,4 +34,4 @@ jobs:
       run: |
         pip install poetry
         cd backend && poetry install --no-root
-        pytest
+        python -m pytest -vv
