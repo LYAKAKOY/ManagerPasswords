@@ -1,4 +1,4 @@
-ame: Python Application Test
+name: Python Application Test
 
 on:
   push:
