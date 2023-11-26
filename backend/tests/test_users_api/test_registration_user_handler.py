@@ -42,7 +42,7 @@ async def test_create_user_handler(
                 },
                 422,
                 {
-                    "detail": "password is too easy"
+                    "detail": "password is too simple"
                 },
         ),
         (
@@ -52,7 +52,7 @@ async def test_create_user_handler(
                 },
                 422,
                 {
-                    "detail": "password is too easy"
+                    "detail": "password is too simple"
                 },
         ),
     ]

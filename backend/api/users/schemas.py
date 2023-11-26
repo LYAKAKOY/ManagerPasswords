@@ -8,7 +8,7 @@ class CheckPasswordStrength:
     @field_validator("password")
     def validate_surname(cls, value):
         if not PasswordStats(value).strength() > 0.5:
-            raise HTTPException(status_code=422, detail="password is too easy")
+            raise HTTPException(status_code=422, detail="password is too simple")
         return value
 class CreateUser(CheckPasswordStrength, BaseModel):
     login: str
