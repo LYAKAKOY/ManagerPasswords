@@ -1,8 +1,10 @@
 import asyncio
-
+from typing import Generator, Any
+from httpx import AsyncClient
 import pytest
 from sqlalchemy import text
-
+from db.session import get_db
+from main import app
 from tests.db_test import async_session
 
 CLEAN_TABLES = ['users']
@@ -25,3 +27,21 @@ async def clean_tables(async_session_test):
         async with session.begin():
             for table_for_cleaning in CLEAN_TABLES:
                 await session.execute(text(f"TRUNCATE TABLE {table_for_cleaning}"))
+
+
+async def _get_test_db():
+    test_db = async_session()
+    try:
+        yield test_db
+    finally:
+        test_db.close()
+
+@pytest.fixture(scope="function")
+async def client() -> Generator[AsyncClient, Any, None]:
+    """
+    Create a new FastAPI TestClient that uses the `get_db` fixture to override
+    the `get_db` dependency that is injected into routes.
+    """
+    app.dependency_overrides[get_db] = _get_test_db
+    async with AsyncClient(app=app, base_url="http://127.0.0.1") as client:
+        yield client
