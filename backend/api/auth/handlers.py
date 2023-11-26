@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 
@@ -8,11 +8,11 @@ import settings
 from JWT import create_access_token
 from api.actions.auth import authenticate_user
 from api.auth.schemas import Token
-from api.users.handlers import user_router
 from db.session import AsyncSession, get_db
 
+auth_router = APIRouter()
 
-@user_router.post("/token", response_model=Token)
+@auth_router.post("/token", response_model=Token)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):
