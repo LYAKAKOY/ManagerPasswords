@@ -14,9 +14,9 @@ jobs:
           python-version: [ 3.11 ]
       env:
         DATABASE: localhost
-        POSTGRES_DB: hello_fastapi_dev
-        POSTGRES_USER: hello_fastapi
-        POSTGRES_PASSWORD: hello_fastapi
+        POSTGRES_DB: test_db
+        POSTGRES_USER: test_user
+        POSTGRES_PASSWORD: test_password
 
       steps:
         - uses: actions/checkout@v2
@@ -42,9 +42,9 @@ jobs:
           uses: Harmon758/postgresql-action@v1.0.0
           with:
             postgresql version: 15-alpine
-            postgresql db: hello_fastapi_dev
-            postgresql user: hello_fastapi
-            postgresql password: hello_fastapi
+            postgresql db: test_db
+            postgresql user: test_user
+            postgresql password: test_password
         - name: Test with pytest
           run: |
             cd backend && pytest
