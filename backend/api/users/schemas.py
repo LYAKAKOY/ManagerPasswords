@@ -6,14 +6,14 @@ from api.base_schemas import TunedModel
 
 class CheckCredentials:
     @field_validator("login")
-    def validate_surname(cls, value):
+    def validate_login(cls, value):
         if not len(value) >= 5:
-            raise HTTPException(status_code=422, detail="login is too short")
+            raise HTTPException(status_code=422, detail="the login is too short")
         return value
     @field_validator("password")
-    def validate_surname(cls, value):
+    def validate_password(cls, value):
         if not PasswordStats(value).strength() > 0.5:
-            raise HTTPException(status_code=422, detail="password is too simple")
+            raise HTTPException(status_code=422, detail="the password is too simple")
         return value
 class CreateUser(CheckCredentials, BaseModel):
     login: str
