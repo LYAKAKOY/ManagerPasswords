@@ -31,7 +31,7 @@ async def clean_tables(async_session_test):
     async with async_session_test() as session:
         async with session.begin():
             for table_for_cleaning in CLEAN_TABLES:
-                await session.execute(text(f"TRUNCATE TABLE {table_for_cleaning}"))
+                await session.execute(text(f"TRUNCATE TABLE {table_for_cleaning} CASCADE "))
 
 
 async def _get_test_db():
