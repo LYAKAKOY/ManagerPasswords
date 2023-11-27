@@ -22,6 +22,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 from db.base import Base
 from db.users.models import User
+from db.passwords.models import Password
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
