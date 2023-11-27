@@ -1,10 +1,12 @@
 import uuid
+from typing import List
 
-from sqlalchemy import update, delete
+from sqlalchemy import update, delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.passwords.models import Password, HexByteString
+from db.users.models import User
 
 
 class PasswordDAL:
@@ -45,3 +47,31 @@ class PasswordDAL:
         except IntegrityError:
             await self.db_session.rollback()
             return
+    async def get_password(self, user_id: uuid.UUID, service_name: str) -> Password | None:
+        query = (
+            select(Password)
+            .where(Password.user_id == user_id, Password.service_name == service_name)
+        )
+        password = await self.db_session.scalars(query)
+        if password is not None:
+            return password
+    async def get_passwords_by_match_service_name(
+        self, user_id: uuid.UUID, service_name: str
+    ) -> List[Password] | None:
+        query = (
+            select(Password)
+            .where(Password.user_id == user_id)
+            .filter(Password.service_name.contains(service_name))
+        )
+        passwords = await self.db_session.scalars(query)
+        if passwords is not None:
+            return passwords
+
+    async def get_all_passwords(self, user_id: uuid.UUID) -> List[Password] | None:
+        query = (
+            select(Password)
+            .where(Password.user_id == user_id)
+        )
+        passwords = await self.db_session.scalars(query)
+        if passwords is not None:
+            return passwords
