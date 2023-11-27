@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import update
+from sqlalchemy import update, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,8 +27,21 @@ class PasswordDAL:
             values(password=password).returning(Password)
         try:
             password = await self.db_session.scalar(query)
+            await self.db_session.commit()
             if password is not None:
                 return password
+        except IntegrityError:
+            await self.db_session.rollback()
+            return
+
+    async def delete_password(self, user_id: uuid.UUID, service_name: str) -> int | None:
+        query = delete(Password).where(Password.user_id == user_id, Password.service_name == service_name).\
+            returning(Password.id)
+        try:
+            password_id = await self.db_session.scalar(query)
+            await self.db_session.commit()
+            if password_id is not None:
+                return password_id
         except IntegrityError:
             await self.db_session.rollback()
             return
