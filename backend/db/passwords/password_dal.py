@@ -6,7 +6,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.passwords.models import Password, HexByteString
-from db.users.models import User
 
 
 class PasswordDAL:
