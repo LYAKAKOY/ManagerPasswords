@@ -65,7 +65,7 @@ async def create_service_password(asyncpg_pool, create_user):
             await connection.execute(
                 """INSERT INTO passwords (service_name, password, user_id) VALUES ($1, $2, $3)""",
                 service,
-                str(AES.encrypt_password(password)),
+                AES.encrypt_password(password),
                 create_user,
             )
             return create_user

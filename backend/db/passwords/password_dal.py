@@ -5,14 +5,14 @@ from sqlalchemy import update, delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.passwords.models import Password, HexByteString
+from db.passwords.models import Password
 
 
 class PasswordDAL:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def create_password(self, user_id: uuid.UUID, service_name: str, password: HexByteString) -> Password | None:
+    async def create_password(self, user_id: uuid.UUID, service_name: str, password: bytes) -> Password | None:
         new_password = Password(user_id=user_id, service_name=service_name, password=password)
         try:
             self.db_session.add(new_password)
@@ -23,7 +23,7 @@ class PasswordDAL:
             await self.db_session.rollback()
             return
 
-    async def set_password(self, user_id: uuid.UUID, service_name: str, password: HexByteString) -> Password | None:
+    async def set_password(self, user_id: uuid.UUID, service_name: str, password: bytes) -> Password | None:
         query = update(Password).where(Password.user_id == user_id, Password.service_name == service_name).\
             values(password=password).returning(Password)
         try:
@@ -51,7 +51,7 @@ class PasswordDAL:
             select(Password)
             .where(Password.user_id == user_id, Password.service_name == service_name)
         )
-        password = await self.db_session.scalars(query)
+        password = await self.db_session.scalar(query)
         if password is not None:
             return password
     async def get_passwords_by_match_service_name(
