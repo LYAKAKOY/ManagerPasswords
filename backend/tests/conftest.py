@@ -1,9 +1,16 @@
 import asyncio
 import os
+import uuid
 from typing import Generator, Any
+
+import asyncpg
 from httpx import AsyncClient
 import pytest
 from sqlalchemy import text
+
+import settings
+from crypting import AES
+from db.passwords.models import HexByteString
 from db.session import get_db
 from main import app
 from tests.db_test import async_session
@@ -25,6 +32,13 @@ def run_migrations():
 async def async_session_test():
     yield async_session
 
+@pytest.fixture(scope="session")
+async def asyncpg_pool():
+    pool = await asyncpg.create_pool("".join(settings.DATABASE_URL.split("+asyncpg")))
+    yield pool
+    pool.close()
+
+
 @pytest.fixture(scope="function", autouse=True)
 async def clean_tables(async_session_test):
     """Clean data in all tables before running test function"""
@@ -32,7 +46,17 @@ async def clean_tables(async_session_test):
         async with session.begin():
             for table_for_cleaning in CLEAN_TABLES:
                 await session.execute(text(f"TRUNCATE TABLE {table_for_cleaning} CASCADE "))
-
+@pytest.fixture(scope="function")
+async def create_user(asyncpg_pool):
+    user_id = uuid.uuid4()
+    async with asyncpg_pool.acquire() as connection:
+        await connection.execute(
+            """INSERT INTO users VALUES ($1, $2, $3)""",
+            user_id,
+            "login",
+            str(AES.encrypt_password("password")),
+        )
+        return user_id
 
 async def _get_test_db():
     async with async_session() as session:
