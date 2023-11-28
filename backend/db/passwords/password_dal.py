@@ -37,7 +37,7 @@ class PasswordDAL:
 
     async def delete_password(self, user_id: uuid.UUID, service_name: str) -> int | None:
         query = delete(Password).where(Password.user_id == user_id, Password.service_name == service_name).\
-            returning(Password.id)
+            returning(Password.user_id)
         try:
             password_id = await self.db_session.scalar(query)
             await self.db_session.commit()
