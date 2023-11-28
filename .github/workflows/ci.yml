@@ -17,7 +17,7 @@ jobs:
         POSTGRES_DB: test_db
         POSTGRES_USER: test_user
         POSTGRES_PASSWORD: test_password
-
+        AES_KEY: f2I1oGzpgpmqL2iErldUWX97VhZ3gMeSmsgsMlH0c2o=
       steps:
         - uses: actions/checkout@v2
         - name: Set up Python ${{ matrix.python-version }}
