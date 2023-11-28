@@ -59,13 +59,17 @@ async def create_user(asyncpg_pool):
 
 @pytest.fixture(scope="function")
 async def create_service_password(asyncpg_pool, create_user):
-    async with asyncpg_pool.acquire() as connection:
-        await connection.execute(
-            """INSERT INTO passwords VALUES ($1, $2, $3)""",
-            create_user,
-            "service",
-            str(AES.encrypt_password("password")),
-        )
+
+    async def create_password(service: str, password: str):
+        async with asyncpg_pool.acquire() as connection:
+            await connection.execute(
+                """INSERT INTO passwords (service_name, password, user_id) VALUES ($1, $2, $3)""",
+                service,
+                str(AES.encrypt_password(password)),
+                create_user,
+            )
+            return create_user
+    return create_password
 async def _get_test_db():
     async with async_session() as session:
         yield session
