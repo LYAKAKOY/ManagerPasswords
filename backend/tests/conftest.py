@@ -35,7 +35,7 @@ async def async_session_test():
 async def asyncpg_pool():
     pool = await asyncpg.create_pool("".join(settings.DATABASE_URL.split("+asyncpg")))
     yield pool
-    pool.close()
+    await pool.close()
 
 
 @pytest.fixture(scope="function", autouse=True)
