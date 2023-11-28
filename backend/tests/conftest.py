@@ -7,10 +7,9 @@ import asyncpg
 from httpx import AsyncClient
 import pytest
 from sqlalchemy import text
-
+from hashing import Hasher
 import settings
 from crypting import AES
-from db.passwords.models import HexByteString
 from db.session import get_db
 from main import app
 from tests.db_test import async_session
@@ -54,10 +53,19 @@ async def create_user(asyncpg_pool):
             """INSERT INTO users VALUES ($1, $2, $3)""",
             user_id,
             "login",
-            str(AES.encrypt_password("password")),
+            Hasher.get_password_hash('password'),
         )
         return user_id
 
+@pytest.fixture(scope="function")
+async def create_service_password(asyncpg_pool, create_user):
+    async with asyncpg_pool.acquire() as connection:
+        await connection.execute(
+            """INSERT INTO passwords VALUES ($1, $2, $3)""",
+            create_user,
+            "service",
+            str(AES.encrypt_password("password")),
+        )
 async def _get_test_db():
     async with async_session() as session:
         yield session
