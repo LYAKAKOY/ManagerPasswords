@@ -33,5 +33,6 @@ async def test_update_password(
         password_dal = PasswordDAL(session)
         service_password = await password_dal.set_password(user_id=user_id, service_name=service_name,
                                                               password=AES.encrypt_password(new_password))
+        assert service_password.user_id == user_id
         assert service_password.service_name == service_name
         assert AES.decrypt_password(service_password.password) == new_password
