@@ -1,7 +1,7 @@
 import asyncio
 import os
 import uuid
-from typing import Generator, Any
+from typing import Generator, Any, Coroutine, Callable
 
 import asyncpg
 from httpx import AsyncClient
@@ -57,8 +57,8 @@ async def create_user(asyncpg_pool):
         )
         return user_id
 
-@pytest.fixture(scope="function")
-async def create_service_password(asyncpg_pool, create_user):
+@pytest.fixture
+async def create_service_password(asyncpg_pool, create_user) -> Callable:
 
     async def create_password(service: str, password: str):
         async with asyncpg_pool.acquire() as connection:

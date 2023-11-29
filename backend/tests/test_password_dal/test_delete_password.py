@@ -1,3 +1,5 @@
+from typing import Callable
+
 from db.passwords.password_dal import PasswordDAL
 import pytest
 
@@ -17,7 +19,7 @@ import pytest
 )
 async def test_update_password(
     async_session_test,
-    create_service_password,
+    create_service_password: Callable,
     service_name,
     password,
 ):
