@@ -9,14 +9,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 async def _create_or_update_password(
-    service_name: str, body: CreatePassword, current_user: User, session: AsyncSession
+    service_name: str, body: CreatePassword, user: User, session: AsyncSession
 ) -> ShowPassword | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
-        if await password_dal.get_password_by_service_name(user_id=current_user.user_id,
+        if await password_dal.get_password_by_service_name(user_id=user.user_id,
                                                                    service_name=service_name):
             service_password = await password_dal.set_password(
-                user_id=current_user.user_id,
+                user_id=user.user_id,
                 service_name=service_name,
                 password=AES.encrypt_password(body.password),
             )
@@ -24,7 +24,7 @@ async def _create_or_update_password(
         else:
             service_password = await password_dal.create_password(
                 service_name=service_name,
-                user_id=current_user.user_id,
+                user_id=user.user_id,
                 password=AES.encrypt_password(body.password),
             )
         if service_password is not None:
@@ -32,12 +32,12 @@ async def _create_or_update_password(
                                 password=AES.decrypt_password(service_password.password))
 
 async def _get_password_by_service_name(
-    service_name: str, current_user: User, session: AsyncSession
+    service_name: str, user: User, session: AsyncSession
 ) -> ShowPassword | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
         service_password = await password_dal.get_password_by_service_name(
-            user_id=current_user.user_id, service_name=service_name
+            user_id=user.user_id, service_name=service_name
         )
         if service_password is not None:
             return ShowPassword(
@@ -46,12 +46,12 @@ async def _get_password_by_service_name(
             )
 
 async def _get_passwords_by_match_service_name(
-    service_name: str, current_user: User, session: AsyncSession
+    service_name: str, user: User, session: AsyncSession
 ) -> List[ShowPassword] | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
         service_passwords = await password_dal.get_passwords_by_match_service_name(
-            user_id=current_user.user_id, service_name=service_name
+            user_id=user.user_id, service_name=service_name
         )
         if service_passwords is not None:
             all_show_passwords = []
@@ -65,11 +65,11 @@ async def _get_passwords_by_match_service_name(
             return all_show_passwords
 
 async def _get_all_passwords(
-    current_user: User, session: AsyncSession
+    user: User, session: AsyncSession
 ) -> List[ShowPassword] | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
-        service_passwords = await password_dal.get_all_passwords(user_id=current_user.user_id)
+        service_passwords = await password_dal.get_all_passwords(user_id=user.user_id)
         if service_passwords is not None:
             all_show_passwords = []
             for service_password in service_passwords:
