@@ -27,5 +27,6 @@ async def test_update_password(
     session = async_session_test()
     async with session.begin():
         password_dal = PasswordDAL(session)
-        deleted_password_user_id = await password_dal.delete_password(user_id=user_id, service_name=service_name)
+        deleted_password_user_id = await password_dal.delete_password_by_service_name(user_id=user_id,
+                                                                                      service_name=service_name)
         assert deleted_password_user_id == user_id
