@@ -50,16 +50,33 @@ async def _get_passwords_by_match_service_name(
 ) -> List[ShowPassword] | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
-        passwords = await password_dal.get_passwords_by_match_service_name(
+        service_passwords = await password_dal.get_passwords_by_match_service_name(
             user_id=current_user.user_id, service_name=service_name
         )
-        if passwords is not None:
+        if service_passwords is not None:
             all_show_passwords = []
-            for password in passwords:
+            for service_password in service_passwords:
                 all_show_passwords.append(
                     ShowPassword(
-                        service_name=password.service_name,
-                        password=AES.decrypt_password(password.password),
+                        service_name=service_password.service_name,
+                        password=AES.decrypt_password(service_password.password),
+                    )
+                )
+            return all_show_passwords
+
+async def _get_all_passwords(
+    current_user: User, session: AsyncSession
+) -> List[ShowPassword] | None:
+    async with session.begin():
+        password_dal = PasswordDAL(session)
+        service_passwords = await password_dal.get_all_passwords(user_id=current_user.user_id)
+        if service_passwords is not None:
+            all_show_passwords = []
+            for service_password in service_passwords:
+                all_show_passwords.append(
+                    ShowPassword(
+                        service_name=service_password.service_name,
+                        password=AES.decrypt_password(service_password.password),
                     )
                 )
             return all_show_passwords
