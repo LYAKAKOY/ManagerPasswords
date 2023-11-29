@@ -28,3 +28,17 @@ async def _create_or_update_password(
         if service_password is not None:
             return ShowPassword(service_name=service_password.service_name,
                                 password=AES.decrypt_password(service_password.password))
+
+async def _get_password_by_service_name(
+    service_name: str, current_user: User, session: AsyncSession
+) -> ShowPassword | None:
+    async with session.begin():
+        password_dal = PasswordDAL(session)
+        service_password = await password_dal.get_password_by_service_name(
+            user_id=current_user.user_id, service_name=service_name
+        )
+        if service_password is not None:
+            return ShowPassword(
+                service_name=service_password.service_name,
+                password=AES.decrypt_password(service_password.password),
+            )
