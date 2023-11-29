@@ -35,7 +35,7 @@ class PasswordDAL:
             await self.db_session.rollback()
             return
 
-    async def delete_password(self, user_id: uuid.UUID, service_name: str) -> int | None:
+    async def delete_password_by_service_name(self, user_id: uuid.UUID, service_name: str) -> int | None:
         query = delete(Password).where(Password.user_id == user_id, Password.service_name == service_name).\
             returning(Password.user_id)
         try:
@@ -46,7 +46,7 @@ class PasswordDAL:
         except IntegrityError:
             await self.db_session.rollback()
             return
-    async def get_password(self, user_id: uuid.UUID, service_name: str) -> Password | None:
+    async def get_password_by_service_name(self, user_id: uuid.UUID, service_name: str) -> Password | None:
         query = (
             select(Password)
             .where(Password.user_id == user_id, Password.service_name == service_name)
