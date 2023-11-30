@@ -10,3 +10,6 @@ class CreatePassword(BaseModel):
 class ShowPassword(TunedModel):
     service_name: str
     password: str
+
+class DeletedPassword(TunedModel):
+    password_id: int
