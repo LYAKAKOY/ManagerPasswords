@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from fastapi import HTTPException, Depends, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
-from starlette import status
+from fastapi import status
 
 import settings
 from JWT import create_access_token
