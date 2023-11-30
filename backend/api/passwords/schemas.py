@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import BaseModel
 
 from api.base_schemas import TunedModel
@@ -12,4 +14,4 @@ class ShowPassword(TunedModel):
     password: str
 
 class DeletedPassword(TunedModel):
-    user_id: int
+    user_id: uuid.UUID
