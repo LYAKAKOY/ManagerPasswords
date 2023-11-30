@@ -4,19 +4,28 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    "service_name, service_password, expected_status_code, expected_detail",
+    "service_name, service_password, service, expected_status_code, expected_detail",
     [
         (
             "yandex.ru",
             "23451",
+            "yandex.ru",
             200,
             {"service_name": "yandex.ru", "password": "23451"},
         ),
         (
             "mail.ru",
             "qwerty",
+            "mail.ru",
             200,
             {"service_name": "mail.ru", "password": "qwerty"},
+        ),
+        (
+            "mail.ru",
+            "qwerty",
+            "mail.ry",
+            404,
+            {"detail": "The password of the service not found"},
         ),
     ],
 )
@@ -26,12 +35,13 @@ async def test_get_password_by_service_name(
     create_test_auth_headers_for_user,
     service_name,
     service_password,
+    service,
     expected_status_code,
     expected_detail,
 ):
     await create_service_password(service_name, service_password)
     response = await client.get(
-        f"/passwords/{service_name}", headers=create_test_auth_headers_for_user
+        f"/passwords/{service}", headers=create_test_auth_headers_for_user
     )
     data_from_response = response.json()
     assert response.status_code == expected_status_code
@@ -39,39 +49,45 @@ async def test_get_password_by_service_name(
 
 
 @pytest.mark.parametrize(
-    "passwords_data",
+    "passwords_data, expected_code, expected_data",
     [
-        [
-            {
-                "service_name": "yandex.ru",
-                "password": "password1",
-            },
-            {
-                "service_name": "google.com",
-                "password": "password2",
-            }
-        ],
-        [
-            {
-                "service_name": "yandex.ru",
-                "password": "password1",
-            },
-            {
-                "service_name": "mail.ru",
-                "password": "password2",
-            },
-            {
-                "service_name": "google.com",
-                "password": "password3",
-            },
-        ],
+        (
+            [
+                {
+                    "service_name": "yandex.ru",
+                    "password": "password1",
+                },
+                {
+                    "service_name": "google.com",
+                    "password": "password2",
+                }
+            ],
+            200,
+            [
+                {
+                    "service_name": "yandex.ru",
+                    "password": "password1",
+                },
+                {
+                    "service_name": "google.com",
+                    "password": "password2",
+                }
+            ],
+        ),
+        (
+            [],
+            404,
+            {"detail": "Not a single password was found"}
+        ),
     ],
 )
-async def test_get_all_passwords(
+async def test_get_all_passwords_handler(
     client,
     create_test_auth_headers_for_user,
     create_service_password: Callable,
     passwords_data,
+    expected_code,
+    expected_data,
 ):
     for password_data in passwords_data:
         await create_service_password(service=password_data['service_name'],
@@ -80,5 +96,106 @@ async def test_get_all_passwords(
         f"/passwords/", headers=create_test_auth_headers_for_user
     )
     data_from_response = response.json()
-    assert response.status_code == 200
-    assert data_from_response == passwords_data
+    assert response.status_code == expected_code
+    assert data_from_response == expected_data
+
+
+@pytest.mark.parametrize(
+     "passwords_data, match_service_name, expected_code, expected_data",
+    [
+        (
+            [
+                {
+                    "service_name": "yandex.ru",
+                    "password": "password1",
+                },
+                {
+                    "service_name": "mail.ru",
+                    "password": "password2",
+                },
+                {
+                    "service_name": "google.com",
+                    "password": "password3",
+                },
+            ],
+            ".ru",
+            200,
+            [
+                {
+                    "service_name": "yandex.ru",
+                    "password": "password1",
+                },
+                {
+                    "service_name": "mail.ru",
+                    "password": "password2",
+                },
+            ]
+        ),
+        (
+            [
+                {
+                    "service_name": "yandex.ru",
+                    "password": "password1",
+                },
+                {
+                    "service_name": "yandex-cloud.ru",
+                    "password": "password2",
+                },
+                {
+                    "service_name": "google.com",
+                    "password": "password3",
+                },
+            ],
+            "yandex",
+            200,
+            [
+                {
+                    "service_name": "yandex.ru",
+                    "password": "password1",
+                },
+                {
+                    "service_name": "yandex-cloud.ru",
+                    "password": "password2",
+                },
+            ]
+        ),
+        (
+            [
+                {
+                    "service_name": "yandex.ru",
+                    "password": "password1",
+                },
+                {
+                    "service_name": "yandex-cloud.ru",
+                    "password": "password2",
+                },
+                {
+                    "service_name": "google.com",
+                    "password": "password3",
+                },
+            ],
+            "amazon",
+            404,
+            {"detail": "No service found"}
+        ),
+    ],
+)
+async def test_get_passwords_by_match_service_name_handler(
+    client,
+    create_test_auth_headers_for_user,
+    create_service_password: Callable,
+    passwords_data,
+    match_service_name,
+    expected_code,
+    expected_data
+):
+    for password_data in passwords_data:
+        await create_service_password(service=password_data['service_name'],
+                                      password=password_data['password'])
+    response = await client.get(
+        f"/passwords/by_match?match_service_name={match_service_name}",
+        headers=create_test_auth_headers_for_user
+    )
+    data_from_response = response.json()
+    assert response.status_code == expected_code
+    assert data_from_response == expected_data
