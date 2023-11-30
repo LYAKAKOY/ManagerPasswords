@@ -22,3 +22,8 @@ ALLOW_ORIGINS: List = env.list(
         "http://localhost:8000",
     ],
 )
+
+SENTRY_URL: str = env.url(
+    "SENTRY_URL",
+    default="https://eec20034949b2b27dc10652f4cef5d46@o4506314416521216.ingest.sentry.io/4506314420649984",
+)
