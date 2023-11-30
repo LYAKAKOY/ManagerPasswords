@@ -39,10 +39,10 @@ class PasswordDAL:
         query = delete(Password).where(Password.user_id == user_id, Password.service_name == service_name).\
             returning(Password.user_id)
         try:
-            password_id = await self.db_session.scalar(query)
+            user_id = await self.db_session.scalar(query)
             await self.db_session.commit()
-            if password_id is not None:
-                return password_id
+            if user_id is not None:
+                return user_id
         except IntegrityError:
             await self.db_session.rollback()
             return

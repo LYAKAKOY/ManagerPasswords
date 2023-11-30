@@ -12,4 +12,4 @@ class ShowPassword(TunedModel):
     password: str
 
 class DeletedPassword(TunedModel):
-    password_id: int
+    user_id: int
