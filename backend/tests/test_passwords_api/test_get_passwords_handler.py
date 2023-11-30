@@ -29,7 +29,7 @@ import pytest
         ),
     ],
 )
-async def test_get_password_by_service_name(
+async def test_get_password_by_service_name_handler(
     client,
     create_service_password: Callable,
     create_test_auth_headers_for_user,
