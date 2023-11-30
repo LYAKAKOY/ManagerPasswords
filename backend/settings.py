@@ -18,7 +18,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES: int = env.int("ACCESS_TOKEN_EXPIRE_MINUTES", defaul
 ALLOW_ORIGINS: List = env.list(
     "ALLOW_ORIGINS",
     default=[
-       "http://localhost",
-       "http://localhost:8000",
-    ]
+        "http://localhost",
+        "http://localhost:8000",
+    ],
 )

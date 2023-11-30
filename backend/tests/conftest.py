@@ -1,22 +1,24 @@
 import asyncio
 import os
 import uuid
-from typing import Generator, Any, Coroutine, Callable
+from typing import Any
+from typing import Callable
+from typing import Generator
 
 import asyncpg
-from httpx import AsyncClient
 import pytest
-from sqlalchemy import text
-
-from JWT import create_access_token
-from hashing import Hasher
 import settings
 from crypting import AES
 from db.session import get_db
+from hashing import Hasher
+from httpx import AsyncClient
+from JWT import create_access_token
 from main import app
+from sqlalchemy import text
 from tests.db_test import async_session
 
-CLEAN_TABLES = ['users']
+CLEAN_TABLES = ["users"]
+
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -25,13 +27,16 @@ def event_loop():
     yield loop
     loop.close()
 
+
 @pytest.fixture(scope="session", autouse=True)
 def run_migrations():
     os.system("alembic upgrade heads")
 
+
 @pytest.fixture(scope="session")
 async def async_session_test():
     yield async_session
+
 
 @pytest.fixture(scope="session")
 async def asyncpg_pool():
@@ -46,7 +51,11 @@ async def clean_tables(async_session_test):
     async with async_session_test() as session:
         async with session.begin():
             for table_for_cleaning in CLEAN_TABLES:
-                await session.execute(text(f"TRUNCATE TABLE {table_for_cleaning} CASCADE "))
+                await session.execute(
+                    text(f"TRUNCATE TABLE {table_for_cleaning} CASCADE ")
+                )
+
+
 @pytest.fixture(scope="function")
 async def create_user(asyncpg_pool):
     user_id = uuid.uuid4()
@@ -55,13 +64,13 @@ async def create_user(asyncpg_pool):
             """INSERT INTO users VALUES ($1, $2, $3)""",
             user_id,
             "login",
-            Hasher.get_password_hash('password'),
+            Hasher.get_password_hash("password"),
         )
         return user_id
 
+
 @pytest.fixture
 async def create_service_password(asyncpg_pool, create_user) -> Callable:
-
     async def create_password(service: str, password: str):
         async with asyncpg_pool.acquire() as connection:
             await connection.execute(
@@ -71,10 +80,14 @@ async def create_service_password(asyncpg_pool, create_user) -> Callable:
                 create_user,
             )
             return create_user
+
     return create_password
+
+
 async def _get_test_db():
     async with async_session() as session:
         yield session
+
 
 @pytest.fixture(scope="function")
 async def client() -> Generator[AsyncClient, Any, None]:
@@ -85,6 +98,7 @@ async def client() -> Generator[AsyncClient, Any, None]:
     app.dependency_overrides[get_db] = _get_test_db
     async with AsyncClient(app=app, base_url="http://127.0.0.1") as client:
         yield client
+
 
 @pytest.fixture
 async def create_test_auth_headers_for_user(create_user):

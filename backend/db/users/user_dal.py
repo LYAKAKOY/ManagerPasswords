@@ -1,10 +1,10 @@
 import uuid
 
-from sqlalchemy import update, select
+from db.users.models import User
+from sqlalchemy import select
+from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from db.users.models import User
 
 
 class UserDAL:
@@ -24,7 +24,12 @@ class UserDAL:
 
     async def set_password(self, login: str, password: str) -> User | None:
         try:
-            query = update(User).where(User.login == login).values(password=password).returning(User)
+            query = (
+                update(User)
+                .where(User.login == login)
+                .values(password=password)
+                .returning(User)
+            )
             user = await self.db_session.scalar(query)
             if user is not None:
                 return user

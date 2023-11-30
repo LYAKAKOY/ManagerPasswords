@@ -60,7 +60,7 @@ async def test_get_password_by_service_name_handler(
                 {
                     "service_name": "google.com",
                     "password": "password2",
-                }
+                },
             ],
             200,
             [
@@ -71,14 +71,10 @@ async def test_get_password_by_service_name_handler(
                 {
                     "service_name": "google.com",
                     "password": "password2",
-                }
+                },
             ],
         ),
-        (
-            [],
-            404,
-            {"detail": "Not a single password was found"}
-        ),
+        ([], 404, {"detail": "Not a single password was found"}),
     ],
 )
 async def test_get_all_passwords_handler(
@@ -90,10 +86,11 @@ async def test_get_all_passwords_handler(
     expected_data,
 ):
     for password_data in passwords_data:
-        await create_service_password(service=password_data['service_name'],
-                                      password=password_data['password'])
+        await create_service_password(
+            service=password_data["service_name"], password=password_data["password"]
+        )
     response = await client.get(
-        f"/passwords/", headers=create_test_auth_headers_for_user
+        "/passwords/", headers=create_test_auth_headers_for_user
     )
     data_from_response = response.json()
     assert response.status_code == expected_code
@@ -101,7 +98,7 @@ async def test_get_all_passwords_handler(
 
 
 @pytest.mark.parametrize(
-     "passwords_data, match_service_name, expected_code, expected_data",
+    "passwords_data, match_service_name, expected_code, expected_data",
     [
         (
             [
@@ -129,7 +126,7 @@ async def test_get_all_passwords_handler(
                     "service_name": "mail.ru",
                     "password": "password2",
                 },
-            ]
+            ],
         ),
         (
             [
@@ -157,7 +154,7 @@ async def test_get_all_passwords_handler(
                     "service_name": "yandex-cloud.ru",
                     "password": "password2",
                 },
-            ]
+            ],
         ),
         (
             [
@@ -176,7 +173,7 @@ async def test_get_all_passwords_handler(
             ],
             "amazon",
             404,
-            {"detail": "No service found"}
+            {"detail": "No service found"},
         ),
     ],
 )
@@ -187,14 +184,15 @@ async def test_get_passwords_by_match_service_name_handler(
     passwords_data,
     match_service_name,
     expected_code,
-    expected_data
+    expected_data,
 ):
     for password_data in passwords_data:
-        await create_service_password(service=password_data['service_name'],
-                                      password=password_data['password'])
+        await create_service_password(
+            service=password_data["service_name"], password=password_data["password"]
+        )
     response = await client.get(
         f"/passwords/by_match?match_service_name={match_service_name}",
-        headers=create_test_auth_headers_for_user
+        headers=create_test_auth_headers_for_user,
     )
     data_from_response = response.json()
     assert response.status_code == expected_code

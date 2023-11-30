@@ -1,16 +1,19 @@
 from datetime import timedelta
 
-from fastapi import HTTPException, Depends, APIRouter
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import status
-
 import settings
-from JWT import create_access_token
 from api.actions.auth import authenticate_user
 from api.auth.schemas import Token
-from db.session import AsyncSession, get_db
+from db.session import AsyncSession
+from db.session import get_db
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
+from fastapi.security import OAuth2PasswordRequestForm
+from JWT import create_access_token
 
 auth_router = APIRouter()
+
 
 @auth_router.post("/token", response_model=Token)
 async def login_for_access_token(

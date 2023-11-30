@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import uuid
-from abc import ABC
 from typing import TYPE_CHECKING
 
 from db.base import Base
