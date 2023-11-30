@@ -31,7 +31,7 @@ async def test_login_user(
         "username": user.login,
         "password": "ADVCDJ432d",
     }
-    response = await client.post("/login/token",
+    response = await client.post("/auth/token",
                                  data=auth_data,
                                  )
     data_from_response = response.json()
@@ -70,7 +70,7 @@ async def test_login_user_incorrect_login(
         "username": user.login + '1',
         "password": "ADVCDJ432d",
     }
-    response = await client.post("/login/token",
+    response = await client.post("/auth/token",
                                  data=auth_data,
                                  )
     data_from_response = response.json()
@@ -108,7 +108,7 @@ async def test_login_user_incorrect_password(
         "username": user.login,
         "password": "ADVCDJ432d2",
     }
-    response = await client.post("/login/token",
+    response = await client.post("/auth/token",
                                  data=auth_data,
                                  )
     data_from_response = response.json()
