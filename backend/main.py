@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
-
+from fastapi.middleware.cors import CORSMiddleware
 from api.auth.handlers import auth_router
 from api.users.handlers import user_router
 from api.passwords.handlers import manager_passwords_router
