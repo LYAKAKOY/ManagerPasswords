@@ -80,5 +80,5 @@ async def delete_password_by_service_name(
     deleted_password = await _delete_password_by_service_name(service_name=service_name, user=current_user, session=db)
     if not deleted_password:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                             detail="Not a single password was found")
+                             detail="service not found")
     return deleted_password
