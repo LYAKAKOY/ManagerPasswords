@@ -1,4 +1,3 @@
-from logging import getLogger
 from typing import List
 
 from api.actions.auth import get_current_user_from_token
