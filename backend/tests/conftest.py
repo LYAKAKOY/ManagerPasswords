@@ -7,6 +7,8 @@ import asyncpg
 from httpx import AsyncClient
 import pytest
 from sqlalchemy import text
+
+from JWT import create_access_token
 from hashing import Hasher
 import settings
 from crypting import AES
@@ -83,3 +85,10 @@ async def client() -> Generator[AsyncClient, Any, None]:
     app.dependency_overrides[get_db] = _get_test_db
     async with AsyncClient(app=app, base_url="http://127.0.0.1") as client:
         yield client
+
+@pytest.fixture
+async def create_test_auth_headers_for_user(create_user):
+    access_token = create_access_token(
+        data={"sub": str(create_user), "other_custom_data": []}
+    )
+    return {"Authorization": f"Bearer {access_token}"}
