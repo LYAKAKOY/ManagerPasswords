@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import Depends, HTTPException, APIRouter, status
 from api.actions.users import _create_user, _change_password_user
 from api.users.schemas import ShowUser, CreateUser, ChangePasswordUser
 from db.session import AsyncSession, get_db
@@ -18,5 +18,5 @@ async def change_password_user(body: ChangePasswordUser, db: AsyncSession = Depe
     """change password of user"""
     user = await _change_password_user(body, db)
     if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
