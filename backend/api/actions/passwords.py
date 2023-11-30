@@ -81,7 +81,7 @@ async def _get_all_passwords(
                 )
             return all_show_passwords
 
-async def delete_password_by_service_name(service_name: str, user: User, session: AsyncSession) -> DeletedPassword | None:
+async def _delete_password_by_service_name(service_name: str, user: User, session: AsyncSession) -> DeletedPassword | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
         password_id = await password_dal.delete_password_by_service_name(user_id=user.user_id, service_name=service_name)
