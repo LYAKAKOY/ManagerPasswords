@@ -1,7 +1,7 @@
 from typing import List
 
 from crypting import AES
-from api.passwords.schemas import CreatePassword
+from api.passwords.schemas import CreatePassword, DeletedPassword
 from api.passwords.schemas import ShowPassword
 from db.passwords.password_dal import PasswordDAL
 from db.users.models import User
@@ -80,3 +80,10 @@ async def _get_all_passwords(
                     )
                 )
             return all_show_passwords
+
+async def delete_password_by_service_name(service_name: str, user: User, session: AsyncSession) -> DeletedPassword | None:
+    async with session.begin():
+        password_dal = PasswordDAL(session)
+        password_id = await password_dal.delete_password_by_service_name(user_id=user.user_id, service_name=service_name)
+        if password_id is not None:
+            return DeletedPassword(password_id=password_id)
