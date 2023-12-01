@@ -1,6 +1,7 @@
 from typing import Callable
 
 import pytest
+from tests.conftest import get_test_auth_headers_for_user
 
 
 @pytest.mark.parametrize(
@@ -31,17 +32,23 @@ import pytest
 )
 async def test_get_password_by_service_name_handler(
     client,
+    create_user: Callable,
     create_service_password: Callable,
-    create_test_auth_headers_for_user,
     service_name,
     service_password,
     service,
     expected_status_code,
     expected_detail,
 ):
-    await create_service_password(service_name, service_password)
+    user = await create_user()
+    await create_service_password(
+        service=service_name,
+        password=service_password,
+        user_id=user["user_id"],
+        aes_key=user["aes_key"],
+    )
     response = await client.get(
-        f"/passwords/{service}", headers=create_test_auth_headers_for_user
+        f"/passwords/{service}", headers=get_test_auth_headers_for_user(user["user_id"])
     )
     data_from_response = response.json()
     assert response.status_code == expected_status_code
@@ -79,18 +86,22 @@ async def test_get_password_by_service_name_handler(
 )
 async def test_get_all_passwords_handler(
     client,
-    create_test_auth_headers_for_user,
+    create_user: Callable,
     create_service_password: Callable,
     passwords_data,
     expected_code,
     expected_data,
 ):
+    user = await create_user()
     for password_data in passwords_data:
         await create_service_password(
-            service=password_data["service_name"], password=password_data["password"]
+            service=password_data["service_name"],
+            password=password_data["password"],
+            user_id=user["user_id"],
+            aes_key=user["aes_key"],
         )
     response = await client.get(
-        "/passwords/", headers=create_test_auth_headers_for_user
+        "/passwords/", headers=get_test_auth_headers_for_user(user["user_id"])
     )
     data_from_response = response.json()
     assert response.status_code == expected_code
@@ -179,20 +190,24 @@ async def test_get_all_passwords_handler(
 )
 async def test_get_passwords_by_match_service_name_handler(
     client,
-    create_test_auth_headers_for_user,
+    create_user,
     create_service_password: Callable,
     passwords_data,
     match_service_name,
     expected_code,
     expected_data,
 ):
+    user = await create_user()
     for password_data in passwords_data:
         await create_service_password(
-            service=password_data["service_name"], password=password_data["password"]
+            service=password_data["service_name"],
+            password=password_data["password"],
+            user_id=user["user_id"],
+            aes_key=user["aes_key"],
         )
     response = await client.get(
         f"/passwords/by_match?match_service_name={match_service_name}",
-        headers=create_test_auth_headers_for_user,
+        headers=get_test_auth_headers_for_user(user["user_id"]),
     )
     data_from_response = response.json()
     assert response.status_code == expected_code

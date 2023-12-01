@@ -14,11 +14,13 @@ async def test_create_password(async_session_test, create_user, service_name, pa
     session = async_session_test()
     async with session.begin():
         password_dal = PasswordDAL(session)
+        user = await create_user("login", "password")
+        aes = AES(user["aes_key"])
         service_password = await password_dal.create_password(
-            user_id=create_user,
+            user_id=user["user_id"],
             service_name=service_name,
-            password=AES.encrypt_password(password),
+            password=aes.encrypt_password(password),
         )
-        assert service_password.user_id == create_user
+        assert service_password.user_id == user["user_id"]
         assert service_password.service_name == service_name
-        assert AES.decrypt_password(service_password.password) == password
+        assert aes.decrypt_password(service_password.password) == password
