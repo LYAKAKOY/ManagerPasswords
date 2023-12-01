@@ -9,6 +9,7 @@ import asyncpg
 import pytest
 import settings
 from crypting import AES
+from cryptography.fernet import Fernet
 from db.session import get_db
 from hashing import Hasher
 from httpx import AsyncClient
@@ -58,28 +59,35 @@ async def clean_tables(async_session_test):
 
 @pytest.fixture(scope="function")
 async def create_user(asyncpg_pool):
-    user_id = uuid.uuid4()
-    async with asyncpg_pool.acquire() as connection:
-        await connection.execute(
-            """INSERT INTO users VALUES ($1, $2, $3)""",
-            user_id,
-            "login",
-            Hasher.get_password_hash("password"),
-        )
-        return user_id
+    async def get_user_fields(login: str = "login", password: str = "password"):
+        user_id = uuid.uuid4()
+        aes_key = Fernet.generate_key()
+        async with asyncpg_pool.acquire() as connection:
+            await connection.execute(
+                """INSERT INTO users VALUES ($1, $2, $3, $4)""",
+                user_id,
+                login,
+                Hasher.get_password_hash(password),
+                aes_key,
+            )
+            return {"user_id": user_id, "aes_key": aes_key}
+
+    return get_user_fields
 
 
 @pytest.fixture
-async def create_service_password(asyncpg_pool, create_user) -> Callable:
-    async def create_password(service: str, password: str):
+async def create_service_password(asyncpg_pool, create_user: Callable) -> Callable:
+    async def create_password(
+        service: str, password: str, user_id: uuid.UUID, aes_key: bytes
+    ):
         async with asyncpg_pool.acquire() as connection:
+            aes = AES(aes_key)
             await connection.execute(
                 """INSERT INTO passwords (service_name, password, user_id) VALUES ($1, $2, $3)""",
                 service,
-                AES.encrypt_password(password),
-                create_user,
+                aes.encrypt_password(password),
+                user_id,
             )
-            return create_user
 
     return create_password
 
@@ -100,9 +108,8 @@ async def client() -> Generator[AsyncClient, Any, None]:
         yield client
 
 
-@pytest.fixture
-async def create_test_auth_headers_for_user(create_user):
+def get_test_auth_headers_for_user(user_id: uuid.UUID):
     access_token = create_access_token(
-        data={"sub": str(create_user), "other_custom_data": []}
+        data={"sub": str(user_id), "other_custom_data": []}
     )
     return {"Authorization": f"Bearer {access_token}"}
