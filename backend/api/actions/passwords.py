@@ -14,25 +14,26 @@ async def _create_or_update_password(
 ) -> ShowPassword | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
+        aes = AES(user.master_password)
         if await password_dal.get_password_by_service_name(
             user_id=user.user_id, service_name=service_name
         ):
             service_password = await password_dal.set_password(
                 user_id=user.user_id,
                 service_name=service_name,
-                password=AES.encrypt_password(body.password),
+                password=aes.encrypt_password(body.password),
             )
 
         else:
             service_password = await password_dal.create_password(
                 service_name=service_name,
                 user_id=user.user_id,
-                password=AES.encrypt_password(body.password),
+                password=aes.encrypt_password(body.password),
             )
         if service_password is not None:
             return ShowPassword(
                 service_name=service_password.service_name,
-                password=AES.decrypt_password(service_password.password),
+                password=aes.decrypt_password(service_password.password),
             )
 
 
@@ -41,13 +42,14 @@ async def _get_password_by_service_name(
 ) -> ShowPassword | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
+        aes = AES(user.master_password)
         service_password = await password_dal.get_password_by_service_name(
             user_id=user.user_id, service_name=service_name
         )
         if service_password is not None:
             return ShowPassword(
                 service_name=service_password.service_name,
-                password=AES.decrypt_password(service_password.password),
+                password=aes.decrypt_password(service_password.password),
             )
 
 
@@ -56,6 +58,7 @@ async def _get_passwords_by_match_service_name(
 ) -> List[ShowPassword] | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
+        aes = AES(user.master_password)
         service_passwords = await password_dal.get_passwords_by_match_service_name(
             user_id=user.user_id, service_name=service_name
         )
@@ -65,7 +68,7 @@ async def _get_passwords_by_match_service_name(
                 all_show_passwords.append(
                     ShowPassword(
                         service_name=service_password.service_name,
-                        password=AES.decrypt_password(service_password.password),
+                        password=aes.decrypt_password(service_password.password),
                     )
                 )
             return all_show_passwords
@@ -76,6 +79,7 @@ async def _get_all_passwords(
 ) -> List[ShowPassword] | None:
     async with session.begin():
         password_dal = PasswordDAL(session)
+        aes = AES(user.master_password)
         service_passwords = await password_dal.get_all_passwords(user_id=user.user_id)
         if service_passwords is not None:
             all_show_passwords = []
@@ -83,7 +87,7 @@ async def _get_all_passwords(
                 all_show_passwords.append(
                     ShowPassword(
                         service_name=service_password.service_name,
-                        password=AES.decrypt_password(service_password.password),
+                        password=aes.decrypt_password(service_password.password),
                     )
                 )
             return all_show_passwords
