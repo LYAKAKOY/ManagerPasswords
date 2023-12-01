@@ -1,17 +1,16 @@
-import os
-
 from cryptography.fernet import Fernet
 
 
 class AES:
-    cipher_suite = Fernet(os.environ.get("AES_KEY").encode("utf-8"))
+    __slots__ = ["cipher_suite"]
 
-    @classmethod
-    def encrypt_password(cls, password: str) -> bytes:
+    def __init__(self, aes_key: bytes):
+        self.cipher_suite = Fernet(aes_key)
+
+    def encrypt_password(self, password: str) -> bytes:
         password_bytes = password.encode("utf-8")
-        return cls.cipher_suite.encrypt(password_bytes)
+        return self.cipher_suite.encrypt(password_bytes)
 
-    @classmethod
-    def decrypt_password(cls, password: bytes) -> str:
-        password_bytes = cls.cipher_suite.decrypt(password)
+    def decrypt_password(self, password: bytes) -> str:
+        password_bytes = self.cipher_suite.decrypt(password)
         return password_bytes.decode("utf-8")

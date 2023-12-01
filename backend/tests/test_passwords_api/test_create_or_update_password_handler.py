@@ -1,6 +1,8 @@
 import json
+from typing import Callable
 
 import pytest
+from tests.conftest import get_test_auth_headers_for_user
 
 
 @pytest.mark.parametrize(
@@ -34,16 +36,17 @@ import pytest
 )
 async def test_create_or_update_password_handler(
     client,
-    create_test_auth_headers_for_user,
+    create_user: Callable,
     service_name,
     password_data,
     expected_status_code,
     expected_detail,
 ):
+    user = await create_user()
     response = await client.post(
         f"/passwords/{service_name}",
         content=json.dumps(password_data),
-        headers=create_test_auth_headers_for_user,
+        headers=get_test_auth_headers_for_user(user["user_id"]),
     )
     data_from_response = response.json()
     assert response.status_code == expected_status_code

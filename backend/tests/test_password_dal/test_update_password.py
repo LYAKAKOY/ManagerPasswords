@@ -22,20 +22,28 @@ from db.passwords.password_dal import PasswordDAL
 )
 async def test_update_password(
     async_session_test,
+    create_user: Callable,
     create_service_password: Callable,
     service_name,
     password,
     new_password,
 ):
-    user_id = await create_service_password(service=service_name, password=password)
+    user = await create_user()
+    await create_service_password(
+        service=service_name,
+        password=password,
+        user_id=user["user_id"],
+        aes_key=user["aes_key"],
+    )
+    aes = AES(user["aes_key"])
     session = async_session_test()
     async with session.begin():
         password_dal = PasswordDAL(session)
         service_password = await password_dal.set_password(
-            user_id=user_id,
+            user_id=user["user_id"],
             service_name=service_name,
-            password=AES.encrypt_password(new_password),
+            password=aes.encrypt_password(new_password),
         )
-        assert service_password.user_id == user_id
+        assert service_password.user_id == user["user_id"]
         assert service_password.service_name == service_name
-        assert AES.decrypt_password(service_password.password) == new_password
+        assert aes.decrypt_password(service_password.password) == new_password
