@@ -1,5 +1,6 @@
 import uuid
 
+from cryptography.fernet import Fernet
 from db.users.models import User
 from sqlalchemy import select
 from sqlalchemy import update
@@ -28,6 +29,21 @@ class UserDAL:
                 update(User)
                 .where(User.login == login)
                 .values(password=password)
+                .returning(User)
+            )
+            user = await self.db_session.scalar(query)
+            if user is not None:
+                return user
+        except IntegrityError:
+            await self.db_session.rollback()
+            return
+
+    async def generate_new_master_password(self, user_id: uuid.UUID) -> User:
+        try:
+            query = (
+                update(User)
+                .where(User.user_id == user_id)
+                .values(master_password=Fernet.generate_key())
                 .returning(User)
             )
             user = await self.db_session.scalar(query)
