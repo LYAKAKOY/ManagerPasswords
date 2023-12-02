@@ -1,6 +1,7 @@
 import uuid
 from typing import List
 
+from crypting import AES
 from db.passwords.models import Password
 from sqlalchemy import delete
 from sqlalchemy import select
@@ -45,6 +46,48 @@ class PasswordDAL:
         except IntegrityError:
             await self.db_session.rollback()
             return
+
+    async def change_aes_key(
+        self, user_id: uuid.UUID, old_aes_key: bytes, new_aes_key: bytes
+    ) -> List[Password] | None:
+        service_passwords = await self.get_all_passwords(user_id=user_id)
+        if service_passwords is None:
+            return
+        aes = AES(old_aes_key)
+        service_passwords = [
+            Password(
+                service_name=service.service_name,
+                password=aes.decrypt_password(service.password),
+                user_id=service.user_id,
+            )
+            for service in service_passwords
+        ]
+        for service_password in service_passwords:
+            query = (
+                delete(Password)
+                .where(
+                    Password.user_id == user_id,
+                    Password.service_name == service_password.service_name,
+                )
+                .returning(Password.user_id)
+            )
+            await self.db_session.execute(query)
+        aes = AES(new_aes_key)
+        new_passwords = []
+        service_passwords = [
+            Password(
+                service_name=service.service_name,
+                password=aes.encrypt_password(service.password),
+                user_id=service.user_id,
+            )
+            for service in service_passwords
+        ]
+        for service in service_passwords:
+            self.db_session.add(service)
+            await self.db_session.flush()
+            new_passwords.append(service)
+        await self.db_session.commit()
+        return new_passwords
 
     async def delete_password_by_service_name(
         self, user_id: uuid.UUID, service_name: str
