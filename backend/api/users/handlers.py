@@ -18,7 +18,7 @@ async def create_user(body: CreateUser, db: AsyncSession = Depends(get_db)) -> S
     """Registration user"""
     user = await _create_user(body, db)
     if user is None:
-        raise HTTPException(status_code=400, detail="this login is already exists")
+        raise HTTPException(status_code=422, detail="this login is already exists")
     return user
 
 
