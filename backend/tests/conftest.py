@@ -2,7 +2,6 @@ import asyncio
 import os
 import uuid
 from typing import Any
-from typing import Callable
 from typing import Generator
 
 import asyncpg
@@ -57,39 +56,31 @@ async def clean_tables(async_session_test):
                 )
 
 
-@pytest.fixture(scope="function")
-async def create_user(asyncpg_pool):
-    async def get_user_fields(login: str = "login", password: str = "password"):
-        user_id = uuid.uuid4()
-        aes_key = Fernet.generate_key()
-        async with asyncpg_pool.acquire() as connection:
-            await connection.execute(
-                """INSERT INTO users VALUES ($1, $2, $3, $4)""",
-                user_id,
-                login,
-                Hasher.get_password_hash(password),
-                aes_key,
-            )
-            return {"user_id": user_id, "aes_key": aes_key}
-
-    return get_user_fields
+async def create_user(asyncpg_pool, login: str = "login", password: str = "password"):
+    user_id = uuid.uuid4()
+    aes_key = Fernet.generate_key()
+    async with asyncpg_pool.acquire() as connection:
+        await connection.execute(
+            """INSERT INTO users VALUES ($1, $2, $3, $4)""",
+            user_id,
+            login,
+            Hasher.get_password_hash(password),
+            aes_key,
+        )
+        return {"user_id": user_id, "aes_key": aes_key}
 
 
-@pytest.fixture
-async def create_service_password(asyncpg_pool, create_user: Callable) -> Callable:
-    async def create_password(
-        service: str, password: str, user_id: uuid.UUID, aes_key: bytes
-    ):
-        async with asyncpg_pool.acquire() as connection:
-            aes = AES(aes_key)
-            await connection.execute(
-                """INSERT INTO passwords (service_name, password, user_id) VALUES ($1, $2, $3)""",
-                service,
-                aes.encrypt_password(password),
-                user_id,
-            )
-
-    return create_password
+async def create_service_password(
+    asyncpg_pool, service: str, password: str, user_id: uuid.UUID, aes_key: bytes
+):
+    async with asyncpg_pool.acquire() as connection:
+        aes = AES(aes_key)
+        await connection.execute(
+            """INSERT INTO passwords (service_name, password, user_id) VALUES ($1, $2, $3)""",
+            service,
+            aes.encrypt_password(password),
+            user_id,
+        )
 
 
 async def _get_test_db():
