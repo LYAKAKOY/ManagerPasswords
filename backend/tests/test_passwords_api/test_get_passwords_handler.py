@@ -1,6 +1,6 @@
-from typing import Callable
-
 import pytest
+from tests.conftest import create_service_password
+from tests.conftest import create_user
 from tests.conftest import get_test_auth_headers_for_user
 
 
@@ -32,16 +32,16 @@ from tests.conftest import get_test_auth_headers_for_user
 )
 async def test_get_password_by_service_name_handler(
     client,
-    create_user: Callable,
-    create_service_password: Callable,
+    asyncpg_pool,
     service_name,
     service_password,
     service,
     expected_status_code,
     expected_detail,
 ):
-    user = await create_user()
+    user = await create_user(asyncpg_pool)
     await create_service_password(
+        asyncpg_pool,
         service=service_name,
         password=service_password,
         user_id=user["user_id"],
@@ -86,15 +86,15 @@ async def test_get_password_by_service_name_handler(
 )
 async def test_get_all_passwords_handler(
     client,
-    create_user: Callable,
-    create_service_password: Callable,
+    asyncpg_pool,
     passwords_data,
     expected_code,
     expected_data,
 ):
-    user = await create_user()
+    user = await create_user(asyncpg_pool)
     for password_data in passwords_data:
         await create_service_password(
+            asyncpg_pool,
             service=password_data["service_name"],
             password=password_data["password"],
             user_id=user["user_id"],
@@ -190,16 +190,16 @@ async def test_get_all_passwords_handler(
 )
 async def test_get_passwords_by_match_service_name_handler(
     client,
-    create_user,
-    create_service_password: Callable,
+    asyncpg_pool,
     passwords_data,
     match_service_name,
     expected_code,
     expected_data,
 ):
-    user = await create_user()
+    user = await create_user(asyncpg_pool)
     for password_data in passwords_data:
         await create_service_password(
+            asyncpg_pool,
             service=password_data["service_name"],
             password=password_data["password"],
             user_id=user["user_id"],

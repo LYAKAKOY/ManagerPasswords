@@ -1,7 +1,7 @@
 import json
-from typing import Callable
 
 import pytest
+from tests.conftest import create_user
 from tests.conftest import get_test_auth_headers_for_user
 
 
@@ -32,17 +32,33 @@ from tests.conftest import get_test_auth_headers_for_user
             200,
             {"service_name": "mail.ru", "password": "qwerty"},
         ),
+        (
+            "yandex.ru",
+            {},
+            422,
+            {
+                "detail": [
+                    {
+                        "input": {},
+                        "loc": ["body", "password"],
+                        "msg": "Field required",
+                        "type": "missing",
+                        "url": "https://errors.pydantic.dev/2.5/v/missing",
+                    }
+                ]
+            },
+        ),
     ],
 )
 async def test_create_or_update_password_handler(
     client,
-    create_user: Callable,
+    asyncpg_pool,
     service_name,
     password_data,
     expected_status_code,
     expected_detail,
 ):
-    user = await create_user()
+    user = await create_user(asyncpg_pool)
     response = await client.post(
         f"/passwords/{service_name}",
         content=json.dumps(password_data),

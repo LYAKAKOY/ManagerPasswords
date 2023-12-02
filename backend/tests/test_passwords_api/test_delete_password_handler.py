@@ -1,6 +1,6 @@
-from typing import Callable
-
 import pytest
+from tests.conftest import create_service_password
+from tests.conftest import create_user
 from tests.conftest import get_test_auth_headers_for_user
 
 
@@ -29,15 +29,15 @@ from tests.conftest import get_test_auth_headers_for_user
 )
 async def test_delete_password_by_service_name_handler(
     client,
-    create_user: Callable,
-    create_service_password: Callable,
+    asyncpg_pool,
     service_name,
     service_password,
     service,
     expected_status_code,
 ):
-    user = await create_user()
+    user = await create_user(asyncpg_pool)
     await create_service_password(
+        asyncpg_pool,
         service=service_name,
         password=service_password,
         user_id=user["user_id"],

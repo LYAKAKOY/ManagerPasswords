@@ -1,6 +1,5 @@
 import pytest
-from db.users.user_dal import UserDAL
-from hashing import Hasher
+from tests.conftest import create_user
 
 
 @pytest.mark.parametrize(
@@ -16,21 +15,18 @@ from hashing import Hasher
     ],
 )
 async def test_login_user(
-    async_session_test,
+    asyncpg_pool,
     client,
     user_data,
     expected_status_code,
 ):
-    session = async_session_test()
-    async with session.begin():
-        user_dal = UserDAL(session)
-        user = await user_dal.create_user(
-            login="login1", password=Hasher.get_password_hash("ADVCDJ432d")
-        )
+    await create_user(
+        asyncpg_pool, login=user_data["login"], password=user_data["password"]
+    )
 
     auth_data = {
-        "username": user.login,
-        "password": "ADVCDJ432d",
+        "username": user_data["login"],
+        "password": user_data["password"],
     }
     response = await client.post(
         "/auth/token",
@@ -56,18 +52,15 @@ async def test_login_user(
     ],
 )
 async def test_login_user_incorrect_login(
-    async_session_test, client, user_data, expected_status_code, expected_data
+    asyncpg_pool, client, user_data, expected_status_code, expected_data
 ):
-    session = async_session_test()
-    async with session.begin():
-        user_dal = UserDAL(session)
-        user = await user_dal.create_user(
-            login="login1", password=Hasher.get_password_hash("ADVCDJ432d")
-        )
+    await create_user(
+        asyncpg_pool, login=user_data["login"], password=user_data["password"]
+    )
 
     auth_data = {
-        "username": user.login + "1",
-        "password": "ADVCDJ432d",
+        "username": user_data["login"] + "1",
+        "password": user_data["password"],
     }
     response = await client.post(
         "/auth/token",
@@ -92,18 +85,15 @@ async def test_login_user_incorrect_login(
     ],
 )
 async def test_login_user_incorrect_password(
-    async_session_test, client, user_data, expected_status_code, expected_data
+    asyncpg_pool, client, user_data, expected_status_code, expected_data
 ):
-    session = async_session_test()
-    async with session.begin():
-        user_dal = UserDAL(session)
-        user = await user_dal.create_user(
-            login="login1", password=Hasher.get_password_hash("ADVCDJ432d")
-        )
+    await create_user(
+        asyncpg_pool, login=user_data["login"], password=user_data["password"]
+    )
 
     auth_data = {
-        "username": user.login,
-        "password": "ADVCDJ432d2",
+        "username": user_data["login"],
+        "password": user_data["password"] + "1",
     }
     response = await client.post(
         "/auth/token",
@@ -112,3 +102,32 @@ async def test_login_user_incorrect_password(
     data_from_response = response.json()
     assert response.status_code == expected_status_code
     assert data_from_response == expected_data
+
+
+async def test_login_without_username_and_password(client):
+
+    auth_data = {}
+    response = await client.post(
+        "/auth/token",
+        data=auth_data,
+    )
+    data_from_response = response.json()
+    assert response.status_code == 422
+    assert data_from_response == {
+        "detail": [
+            {
+                "input": None,
+                "loc": ["body", "username"],
+                "msg": "Field required",
+                "type": "missing",
+                "url": "https://errors.pydantic.dev/2.5/v/missing",
+            },
+            {
+                "input": None,
+                "loc": ["body", "password"],
+                "msg": "Field required",
+                "type": "missing",
+                "url": "https://errors.pydantic.dev/2.5/v/missing",
+            },
+        ]
+    }

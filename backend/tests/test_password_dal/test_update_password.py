@@ -1,8 +1,8 @@
-from typing import Callable
-
 import pytest
 from crypting import AES
 from db.passwords.password_dal import PasswordDAL
+from tests.conftest import create_service_password
+from tests.conftest import create_user
 
 
 @pytest.mark.parametrize(
@@ -22,14 +22,14 @@ from db.passwords.password_dal import PasswordDAL
 )
 async def test_update_password(
     async_session_test,
-    create_user: Callable,
-    create_service_password: Callable,
+    asyncpg_pool,
     service_name,
     password,
     new_password,
 ):
-    user = await create_user()
+    user = await create_user(asyncpg_pool)
     await create_service_password(
+        asyncpg_pool,
         service=service_name,
         password=password,
         user_id=user["user_id"],
