@@ -86,7 +86,6 @@ class PasswordDAL:
             self.db_session.add(service)
             await self.db_session.flush()
             new_passwords.append(service)
-        await self.db_session.commit()
         return new_passwords
 
     async def delete_password_by_service_name(
