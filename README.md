@@ -1,7 +1,5 @@
 # 🔐ManagerPasswords
 
-<img src="https://img.icons8.com/?size=512&id=kTuxVYRKeKEY&format=png" height="100" />
-
 Storing passwords in a safe place (API)
 
 ![PyPI pyversions](https://img.shields.io/badge/python-3.11-blue)
