@@ -34,10 +34,12 @@ async def test_update_user_master_password(
     async_session_test, asyncpg_pool, login, password
 ):
     session = async_session_test()
-    user1 = await create_user(asyncpg_pool, login=login, password=password)
+    user = await create_user(asyncpg_pool, login=login, password=password)
     async with session.begin():
         user_dal = UserDAL(session)
-        user2 = await user_dal.generate_new_master_password(user_id=user1["user_id"])
-        assert Hasher.verify_password(password, user2.password)
-        assert user2.login == login
-        assert user2.master_password != user1["aes_key"]
+        updated_user = await user_dal.generate_new_master_password(
+            user_id=user["user_id"], old_aes_key=user["aes_key"]
+        )
+        assert Hasher.verify_password(password, updated_user.password)
+        assert updated_user.login == login
+        assert updated_user.master_password != user["aes_key"]
