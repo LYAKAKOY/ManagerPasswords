@@ -78,8 +78,10 @@ docker compose -f docker-compose-dev.yaml up -d
 ```
 
 ### 📝 Documentation
+
 API documentation will be available after running
 [Documentation](http://localhost:8000/docs) at http://localhost:8000/docs
+
 ---
 
 ### 🧪 Tests
