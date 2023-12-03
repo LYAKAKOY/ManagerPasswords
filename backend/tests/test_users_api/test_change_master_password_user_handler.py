@@ -61,3 +61,18 @@ async def test_change_master_password_user(
     data_from_response = response.json()
     assert response.status_code == 200
     assert data_from_response == passwords_data
+
+
+async def test_change_master_password_user_without_headers(
+    client,
+    asyncpg_pool,
+):
+    await create_user(
+        asyncpg_pool,
+    )
+    response = await client.put(
+        "/user/change_master_password",
+    )
+    data_from_response = response.json()
+    assert response.status_code == 401
+    assert data_from_response == {"detail": "Not authenticated"}

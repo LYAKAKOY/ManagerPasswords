@@ -52,3 +52,22 @@ async def test_delete_password_by_service_name_handler(
         assert data_from_response == {"user_id": str(user["user_id"])}
     else:
         assert data_from_response == {"detail": "service not found"}
+
+
+async def test_delete_password_by_service_name_handler_without_headers(
+    client,
+    asyncpg_pool,
+):
+    service_name = "yandex.ru"
+    user = await create_user(asyncpg_pool)
+    await create_service_password(
+        asyncpg_pool,
+        service=service_name,
+        password="password",
+        user_id=user["user_id"],
+        aes_key=user["aes_key"],
+    )
+    response = await client.delete(f"/passwords/{service_name}")
+    data_from_response = response.json()
+    assert response.status_code == 401
+    assert data_from_response == {"detail": "Not authenticated"}

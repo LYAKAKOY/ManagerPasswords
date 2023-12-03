@@ -67,3 +67,21 @@ async def test_create_or_update_password_handler(
     data_from_response = response.json()
     assert response.status_code == expected_status_code
     assert data_from_response == expected_detail
+
+
+async def test_create_or_update_password_handler_without_headers(
+    client,
+    asyncpg_pool,
+):
+    service_name = "yandex.ru"
+    password_data = {
+        "password": "23451",
+    }
+    await create_user(asyncpg_pool)
+    response = await client.post(
+        f"/passwords/{service_name}",
+        content=json.dumps(password_data),
+    )
+    data_from_response = response.json()
+    assert response.status_code == 401
+    assert data_from_response == {"detail": "Not authenticated"}

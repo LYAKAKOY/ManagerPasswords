@@ -212,3 +212,31 @@ async def test_get_passwords_by_match_service_name_handler(
     data_from_response = response.json()
     assert response.status_code == expected_code
     assert data_from_response == expected_data
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "/passwords/",
+        "/passwords/by_match?match_service_name=yandex",
+        "/passwords/yandex.ru",
+    ],
+)
+async def test_get_passwords_all_handler_without_headers(
+    client,
+    asyncpg_pool,
+    url,
+):
+    service_name = "yandex.ru"
+    user = await create_user(asyncpg_pool)
+    await create_service_password(
+        asyncpg_pool,
+        service=service_name,
+        password="password",
+        user_id=user["user_id"],
+        aes_key=user["aes_key"],
+    )
+    response = await client.get(url)
+    data_from_response = response.json()
+    assert response.status_code == 401
+    assert data_from_response == {"detail": "Not authenticated"}
