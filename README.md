@@ -10,8 +10,6 @@ Storing passwords in a safe place (API)
 ## 🔗 Quick Links
 * [Overview](#-overview)
 * [Getting Started](#-getting-started)
-* [Project Roadmap](#-project-roadmap)
-* [Contributing](#-contributing)
 * [License](#-license)
 
 ---
