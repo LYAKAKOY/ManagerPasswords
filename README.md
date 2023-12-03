@@ -44,7 +44,7 @@ It can also search for a part of the service name.
 Please ensure you have the following dependencies installed on your system:
 
 - *Python version 3.11 or higher*
-- *Package manager (i.e. pip, conda, poetry) or Docker*
+- *Package manager poetry or Docker*
 
 
 ***ManagerPasswords API***
