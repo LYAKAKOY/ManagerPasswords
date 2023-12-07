@@ -32,7 +32,10 @@ async def _get_user_by_login_for_auth(login: str, session: AsyncSession) -> User
 
 async def authenticate_user(login: str, password: str, db: AsyncSession) -> User | None:
     if (user := await _get_user_by_login_for_auth(login=login, session=db)) is None:
-        return
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+        )
     if not Hasher.verify_password(password, user.password):
         return
     return user
