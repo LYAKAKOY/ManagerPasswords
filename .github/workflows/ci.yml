@@ -43,5 +43,5 @@ jobs:
               ${{ runner.os }}-buildx-
         - name: Docker compose up
           run: |
-            docker compose -f docker-compose-dev.yaml up -d &&
+            docker compose -f docker-compose-test.yaml up -d &&
             docker-compose -f docker-compose-test.yaml run --rm backend_test sh -c 'pytest'
