@@ -89,7 +89,8 @@ API documentation will be available after running
 Execute the test suite using the command below.
 
 ```bash
- docker-compose -f docker-compose-test.yaml run --rm backend_test sh -c 'pytest'
+ docker compose -f docker-compose-test.yaml up -d &&
+ docker compose -f docker-compose-test.yaml run --rm backend_test sh -c 'pytest'
 ```
 
 ---
