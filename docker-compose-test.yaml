@@ -7,10 +7,12 @@ services:
       dockerfile: Dockerfile_backend_test
     volumes:
       - ./backend:/backend
-    env_file:
-      - backend/.env_test
     environment:
       DATABASE: database_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PORT: 5432
     networks:
       - web_app_network
     ports:
@@ -23,8 +25,11 @@ services:
   database_test:
     image: postgres:15-alpine3.18
     container_name: database_test
-    env_file:
-      - backend/.env_test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PORT: 5432
     ports:
       - '127.0.0.1:5432:5432'
     networks:
