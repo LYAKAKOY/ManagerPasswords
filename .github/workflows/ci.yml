@@ -27,14 +27,6 @@ jobs:
             key: ${{ runner.os }}-buildx-${{ github.sha }}
             restore-keys: |
               ${{ runner.os }}-buildx-
-        - name: Build and push
-          uses: docker/build-push-action@v5
-          with:
-            context: .
-            push: true
-            tags: test_manager_passwords:latest
-            cache-from: type=local,src=/tmp/.buildx-cache
-            cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
         - name: Docker compose up
           run: |
             docker compose -f docker-compose-test.yaml up -d &&
