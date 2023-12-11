@@ -9,6 +9,12 @@ on:
 jobs:
     test_job:
       runs-on: ubuntu-latest
+      env:
+        DATABASE: database_test
+        POSTGRES_DB: test_db
+        POSTGRES_USER: test_user
+        POSTGRES_PASSWORD: test_password
+        POSTGRES_PORT: 5432
       steps:
         - uses: actions/checkout@v2
         - name: Lint with flake8
