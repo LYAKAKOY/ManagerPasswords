@@ -9,12 +9,6 @@ on:
 jobs:
     test_job:
       runs-on: ubuntu-latest
-      env:
-        DATABASE: database_test
-        POSTGRES_DB: test_db
-        POSTGRES_USER: test_user
-        POSTGRES_PASSWORD: test_password
-        POSTGRES_PORT: 5432
       steps:
         - uses: actions/checkout@v2
         - name: Lint with flake8
@@ -36,4 +30,4 @@ jobs:
         - name: Docker compose up
           run: |
             docker compose -f docker-compose-test.yaml up -d &&
-            docker-compose -f docker-compose-test.yaml run --rm backend_test sh -c 'pytest'
+            docker compose -f docker-compose-test.yaml run --rm backend_test sh -c 'pytest'
