@@ -31,3 +31,7 @@ jobs:
           run: |
             docker compose -f docker-compose-test.yaml up -d &&
             docker compose -f docker-compose-test.yaml run --rm backend_test sh -c 'pytest'
+        - name: Move cache
+          run: |
+            rm -rf /tmp/.buildx-cache
+            mv /tmp/.buildx-cache-new /tmp/.buildx-cache
