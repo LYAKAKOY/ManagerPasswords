@@ -32,6 +32,7 @@ jobs:
           with:
             context: .
             push: true
+            tags: test_manager_passwords:latest
             cache-from: type=local,src=/tmp/.buildx-cache
             cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
         - name: Docker compose up
