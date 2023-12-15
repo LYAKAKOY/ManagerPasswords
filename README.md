@@ -66,6 +66,11 @@ You should also connect this project to [Sentry](https://sentry.io/) and add SEN
 
 For example:
 - *SENTRY_URL: https://eec20034949b2b27dc10652f4cef5d46@o4506314416521216.ingest.sentry.io/454243420649984*
+
+You can also specify your secret key in the settings file for JWT auth
+
+For example:
+- *SECRET_KEY: str = env.str("SECRET_KEY", default="your_secret_key")*
 </details>
 
 ---
