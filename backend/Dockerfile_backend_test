@@ -8,6 +8,8 @@ FROM python:3.11-alpine3.18
 
 WORKDIR /backend
 
+RUN apk add postgresql-client build-base postgresql-dev
+
 COPY --from=builder requirements.txt ./
 RUN python -m pip install --no-cache-dir -r requirements.txt
 
