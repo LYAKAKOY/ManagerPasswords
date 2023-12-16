@@ -15,13 +15,19 @@ services:
       - web_app_network
     ports:
       - '127.0.0.1:8000:8000'
-    command: sh -c "while ! nc -z database 5432; do sleep 1; done && alembic upgrade heads && uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+    command: sh -c "alembic upgrade heads && uvicorn main:app --reload --host 0.0.0.0 --port 8000"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
 
   database:
     image: postgres:15-alpine3.18
     container_name: database
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d managerpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - data_db:/var/lib/postgresql/data
     env_file:

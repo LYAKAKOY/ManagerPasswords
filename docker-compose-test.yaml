@@ -20,11 +20,17 @@ services:
     command: >
       sh -c "uvicorn main:app --reload --host 0.0.0.0 --port 8000"
     depends_on:
-      - database_test
+      database_test:
+        condition: service_healthy
 
   database_test:
     image: postgres:15-alpine3.18
     container_name: database_test
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
