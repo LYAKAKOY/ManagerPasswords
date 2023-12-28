@@ -17,7 +17,7 @@ Storing passwords in a safe place (API)
 ## 🔭 Overview
 ***Stack***
 
-FastApi, PostgresSQL, Sentry, Docker
+FastApi, PostgreSQL, Sentry, Docker
 
 ***Users***
 
